@@ -17,16 +17,23 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 @RequestMapping("/api/todo")
 public class TodoController {
-    private final TodoService service;
+    
+    //TodoService 주입
+    private final TodoService todoService;
 
+    //특정 tno의 todo 조회
     @GetMapping("/{tno}")
     public TodoDTO get(@PathVariable(name = "tno") Long tno) {
-        return service.get(tno);
+        
+        return todoService.get(tno);
     }
 
+    // list/page=1&size=10 호출 처리
     @GetMapping("/list")
     public PageResponseDTO<TodoDTO> list(PageRequestDTO pageRequestDTO) {
+
         log.info(pageRequestDTO);
-        return service.list(pageRequestDTO);
+
+        return todoService.list(pageRequestDTO);
     }
 }
