@@ -14,6 +14,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.zerock.mallapi.domain.QTodo;
 import org.zerock.mallapi.domain.Todo;
+import org.zerock.mallapi.dto.PageRequestDTO;
+import org.zerock.mallapi.dto.PageResponseDTO;
+import org.zerock.mallapi.dto.TodoDTO;
 
 import lombok.extern.log4j.Log4j2;
 
@@ -92,4 +95,18 @@ public class TodoRepositoryTests {
         log.info(list);
     }
 
+    @Test
+    public void testSearch3() {
+
+        String keyword = "11";
+        PageRequestDTO requestDTO = PageRequestDTO.builder()
+        .page(2)
+        .build();
+
+        // TodoRepository의 search
+        PageResponseDTO<TodoDTO> responseDTO = todoRepository.search(keyword, requestDTO);
+        
+        log.info("responseDTO--------------------");
+        log.info(responseDTO);
+    }
 }
