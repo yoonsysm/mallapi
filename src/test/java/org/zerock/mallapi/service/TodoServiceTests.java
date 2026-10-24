@@ -6,6 +6,8 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.zerock.mallapi.dto.PageRequestDTO;
+import org.zerock.mallapi.dto.PageResponseDTO;
 import org.zerock.mallapi.dto.TodoDTO;
 
 import lombok.extern.log4j.Log4j2;
@@ -16,7 +18,7 @@ public class TodoServiceTests {
     @Autowired
     private TodoService todoService;
 
-    @Disabled 
+    @Disabled
     @Test
     public void testRegister() {
         TodoDTO todoDTO = TodoDTO.builder()
@@ -28,7 +30,7 @@ public class TodoServiceTests {
         log.info("TNO: " + tno);
     }
 
-    @Disabled 
+    @Disabled
     @Test
     public void testGet() {
         Long tno = 101L;
@@ -36,25 +38,36 @@ public class TodoServiceTests {
         log.info(todoDTO);
     }
 
-    @Disabled 
-    @Test 
+    @Disabled
+    @Test
     public void testModify() {
         TodoDTO todoDTO = TodoDTO.builder()
-        .tno(105L)
-        .title("Test Update Title")
-        .complete(true)
-        .dueDate(LocalDate.of(2026,12,31))
-        .build();
+                .tno(105L)
+                .title("Test Update Title")
+                .complete(true)
+                .dueDate(LocalDate.of(2026, 12, 31))
+                .build();
 
         todoService.modify(todoDTO);
-        
+
     }
 
-    @Test 
+    @Test
     public void testRemove() {
         Long tno = 105L;
 
         todoService.remove(tno);
+    }
+
+    @Test
+    public void testList() {
+        PageRequestDTO pageRequestDTO = PageRequestDTO.builder()
+                .page(2)
+                .size(10)
+                .build();
+        PageResponseDTO<TodoDTO> dto = todoService.list(pageRequestDTO);
+        log.info(dto);
+        log.info(dto.getPageNumList());
     }
 
 }
