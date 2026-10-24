@@ -42,7 +42,7 @@ public class TodoServiceTests {
     @Test
     public void testModify() {
         TodoDTO todoDTO = TodoDTO.builder()
-                .tno(105L)
+                .tno(339L)
                 .title("Test Update Title")
                 .complete(true)
                 .dueDate(LocalDate.of(2026, 12, 31))
