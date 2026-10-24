@@ -44,12 +44,16 @@ public class TodoServiceImpl implements TodoService {
         todo.changeTitle(todoDTO.getTitle());
         todo.changeDueDate(todoDTO.getDueDate());
         todo.changeComplete(todoDTO.isComplete());
-        todoRepository.save(todo);
+
+        // dirty checking
+        // todoRepository.save(todo);
     }
 
     @Override
     public void remove(Long tno) {
-        todoRepository.deleteById(tno);
+
+        log.info("remove------------------------------");
+        // todoRepository.deleteById(tno);
     }
 
 }
