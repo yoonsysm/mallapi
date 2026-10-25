@@ -16,7 +16,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.zerock.mallapi.dto.PageRequestDTO;
+import org.zerock.mallapi.dto.PageResponseDTO;
 import org.zerock.mallapi.dto.ProductDTO;
+import org.zerock.mallapi.service.ProductService;
 import org.zerock.mallapi.util.CustomFileUtil;
 
 import lombok.RequiredArgsConstructor;
@@ -28,6 +31,7 @@ import lombok.extern.log4j.Log4j2;
 @RequestMapping("/api/products")
 public class ProductController {
 
+    private final ProductService productService; // ProductServcie 주입
     private final CustomFileUtil fileUtil;
 
     @Value("${org.zerock.upload.path}")
@@ -45,7 +49,16 @@ public class ProductController {
 
         log.info(uploadFileNames);
 
-        return Map.of("RESULT", "SUCCESS");
+        // 서비스 호출
+        Long pno = productService.register(productDTO);
+
+        return Map.of("RESULT", pno.toString());
+    }
+
+    @GetMapping("/list")
+    public PageResponseDTO<ProductDTO> list(PageRequestDTO pageRequestDTO) {
+        log.info("list............." + pageRequestDTO);
+        return productService.getList(pageRequestDTO);
     }
 
     @GetMapping("/view/{fileName}")
@@ -70,7 +83,7 @@ public class ProductController {
             try {
                 Files.deleteIfExists(filePath);
                 Files.deleteIfExists(thumbnailPath);
-                
+
             } catch (IOException e) {
                 throw new RuntimeException(e.getMessage());
             }
