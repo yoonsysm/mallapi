@@ -63,7 +63,7 @@ public class TodoServiceImpl implements TodoService {
     public void remove(Long tno) {
 
         log.info("remove------------------------------");
-        // todoRepository.deleteById(tno);
+        todoRepository.deleteById(tno);
     }
 
     @Override
