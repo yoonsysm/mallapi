@@ -167,7 +167,8 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public void remove(Long pno) {
-        
+
+        // productRepository.deleteById(pno);
         productRepository.updateToDelete(pno, true);
     }
 
