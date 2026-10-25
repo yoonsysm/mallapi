@@ -38,7 +38,7 @@ public class ProductController {
     private String uploadPath;
 
     @PostMapping({ "", "/" })
-    public Map<String, String> register(ProductDTO productDTO) {
+    public Map<String, Long> register(ProductDTO productDTO) {
 
         log.info("rgister: " + productDTO);
 
@@ -52,7 +52,13 @@ public class ProductController {
         // 서비스 호출
         Long pno = productService.register(productDTO);
 
-        return Map.of("RESULT", pno.toString());
+        return Map.of("result", pno);
+    }
+
+    @GetMapping("/{pno}")
+    public ProductDTO read(@PathVariable(name = "pno") Long pno) {
+       
+        return productService.get(pno);
     }
 
     @GetMapping("/list")
