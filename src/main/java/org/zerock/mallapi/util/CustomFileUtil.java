@@ -9,7 +9,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -50,14 +55,41 @@ public class CustomFileUtil {
 
             try {
                 Files.copy(multipartFile.getInputStream(), savePath);
+
+                String contentType = multipartFile.getContentType();
+
+                if (contentType != null && contentType.startsWith("image")) { // 이미지여부 확인
+                    Path thumbnailPath = Paths.get(uploadPath, "s_" + savedName);
+                    Thumbnails.of(savePath.toFile())
+                            .size(200, 200)
+                            .toFile(thumbnailPath.toFile());
+                }
+
                 uploadNames.add(savedName);
-                
+
             } catch (IOException e) {
                 throw new RuntimeException(e.getMessage());
             }
-        } 
-        // end for
+        } // end for
         return uploadNames;
+    }
+
+    public ResponseEntity<Resource> getFile(String fileName) {
+        Resource resource = new FileSystemResource(uploadPath + File.separator + fileName);
+        
+        if (!resource.exists()) {
+            resource = new FileSystemResource(uploadPath + File.separator + "default.jpg");
+        }
+        
+        HttpHeaders headers = new HttpHeaders();
+        try {
+            headers.add("Content-Type", Files.probeContentType(resource.getFile().toPath()));
+        
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+        
+        return ResponseEntity.ok().headers(headers).body(resource);
     }
 
 }
