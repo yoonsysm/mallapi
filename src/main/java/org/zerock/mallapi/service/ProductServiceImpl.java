@@ -9,6 +9,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.zerock.mallapi.domain.Product;
 import org.zerock.mallapi.domain.ProductImage;
 import org.zerock.mallapi.dto.PageRequestDTO;
@@ -133,12 +135,40 @@ public class ProductServiceImpl implements ProductService {
             return productDTO;
         }
 
-        List<String> fileNameList = imageList.stream().map(productImage -> 
-            productImage.getFileName()).toList();
+        List<String> fileNameList = imageList.stream().map(productImage -> productImage.getFileName()).toList();
 
         productDTO.setUploadFileNames(fileNameList);
 
         return productDTO;
+    }
+
+    @Override
+    public void modify(ProductDTO productDTO) {
+        // step1 read
+        Optional<Product> result = productRepository.findById(productDTO.getPno());
+        Product product = result.orElseThrow();
+        // change pname, pdesc, price
+        product.changeName(productDTO.getPname());
+        product.changeDesc(productDTO.getPdesc());
+        product.changePrice(productDTO.getPrice());
+        product.changeDel(productDTO.isDelFlag());
+        // upload File -- clear first
+        product.clearList();
+
+        List<String> uploadFileNames = productDTO.getUploadFileNames();
+
+        if (uploadFileNames != null && uploadFileNames.size() > 0) {
+            uploadFileNames.stream().forEach(uploadName -> {
+                product.addImageString(uploadName);
+            });
+        }
+        productRepository.save(product);
+    }
+
+    @Override
+    public void remove(Long pno) {
+        
+        productRepository.updateToDelete(pno, true);
     }
 
 }

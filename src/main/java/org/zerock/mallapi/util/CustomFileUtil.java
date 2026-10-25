@@ -76,20 +76,42 @@ public class CustomFileUtil {
 
     public ResponseEntity<Resource> getFile(String fileName) {
         Resource resource = new FileSystemResource(uploadPath + File.separator + fileName);
-        
+
         if (!resource.exists()) {
             resource = new FileSystemResource(uploadPath + File.separator + "default.jpg");
         }
-        
+
         HttpHeaders headers = new HttpHeaders();
         try {
             headers.add("Content-Type", Files.probeContentType(resource.getFile().toPath()));
-        
+
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
         }
-        
+
         return ResponseEntity.ok().headers(headers).body(resource);
+    }
+
+    public void deleteFiles(List<String> fileNames) {
+        if (fileNames == null || fileNames.size() == 0) {
+            return;
+        }
+
+        fileNames.forEach(fileName -> {
+            // 썸네일이 있는지 확인하고 삭제
+            String thumbnailFileName = "s_" + fileName;
+
+            Path thumbnailPath = Paths.get(uploadPath, thumbnailFileName);
+            Path filePath = Paths.get(uploadPath, fileName);
+
+            try {
+                Files.deleteIfExists(filePath);
+                Files.deleteIfExists(thumbnailPath);
+
+            } catch (IOException e) {
+                throw new RuntimeException(e.getMessage());
+            }
+        });
     }
 
 }
