@@ -9,8 +9,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.zerock.mallapi.domain.Product;
 import org.zerock.mallapi.domain.ProductImage;
 import org.zerock.mallapi.dto.PageRequestDTO;
