@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -13,6 +14,8 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.zerock.mallapi.security.handler.APILoginFailHandler;
+import org.zerock.mallapi.security.handler.APILoginSuccessHandler;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -31,14 +34,16 @@ public class CustomSecurityConfig {
             httpSecurityCorsConfigurer.configurationSource(corsConfigurationSource());
         });
 
-        // http.sessionManagement(sessionConfig ->
-        // sessionConfig.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-        // http.csrf(config -> config.disable());
+        http.sessionManagement(httpSecuritySessionManagementConfigurer -> httpSecuritySessionManagementConfigurer
+                .sessionCreationPolicy(SessionCreationPolicy.NEVER));
 
+        // http.csrf(config -> config.disable());
         http.csrf(httpSecurityCsrfConfigurer -> httpSecurityCsrfConfigurer.disable());
 
         http.formLogin(config -> {
             config.loginPage("/api/member/login");
+            config.successHandler(new APILoginSuccessHandler());
+            config.failureHandler(new APILoginFailHandler());
         });
 
         return http.build();
