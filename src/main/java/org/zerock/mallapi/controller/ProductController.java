@@ -1,9 +1,5 @@
 package org.zerock.mallapi.controller;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -19,6 +15,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+
 import org.zerock.mallapi.dto.PageRequestDTO;
 import org.zerock.mallapi.dto.PageResponseDTO;
 import org.zerock.mallapi.dto.ProductDTO;
@@ -55,7 +52,7 @@ public class ProductController {
         // 서비스 호출
         Long pno = productService.register(productDTO);
 
-        return Map.of("RESULT", pno);
+        return Map.of("result", pno);
     }
 
     @GetMapping("/{pno}")
