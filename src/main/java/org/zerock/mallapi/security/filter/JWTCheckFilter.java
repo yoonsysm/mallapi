@@ -2,9 +2,13 @@ package org.zerock.mallapi.security.filter;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.List;
 import java.util.Map;
 
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.zerock.mallapi.dto.MemberDTO;
 import org.zerock.mallapi.util.JWTUtil;
 
 import com.google.gson.Gson;
@@ -25,6 +29,10 @@ public class JWTCheckFilter extends OncePerRequestFilter {
         String path = request.getRequestURI();
 
         log.info("check uri.............." + path);
+
+        if(path.startsWith("/api/member/")){
+            return true;
+        }
 
         // false = check
         return false;
@@ -47,6 +55,23 @@ public class JWTCheckFilter extends OncePerRequestFilter {
 
             log.info("JWT claims: " + claims);
 
+            String email = (String) claims.get("email");
+            String pw = (String) claims.get("pw");
+            String nickname = (String) claims.get("nickname");
+            Boolean social = (Boolean) claims.get("social");
+            List<String> roleNames = (List<String>) claims.get("roleNames");
+
+            MemberDTO memberDTO = new MemberDTO(email, pw, nickname, social.booleanValue(),
+                    roleNames);
+
+            log.info("memberDTO-----------------------------------");
+            log.info(memberDTO);
+            log.info(memberDTO.getAuthorities());
+
+            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(memberDTO,
+                    pw, memberDTO.getAuthorities());
+
+            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             filterChain.doFilter(request, response);
 
         } catch (Exception e) {
@@ -59,7 +84,7 @@ public class JWTCheckFilter extends OncePerRequestFilter {
             String msg = gson.toJson(Map.of("error", "ERROR_ACCESS_TOKEN"));
 
             response.setContentType("application/json; charset=UTF-8");
-            
+
             PrintWriter printWriter = response.getWriter();
             printWriter.println(msg);
             printWriter.close();
