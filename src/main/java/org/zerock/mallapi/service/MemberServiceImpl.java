@@ -6,6 +6,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
@@ -22,6 +23,8 @@ import lombok.extern.log4j.Log4j2;
 public class MemberServiceImpl implements MemberService {
 
     private final MemberRepository memberRepository;
+
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public MemberDTO getKakaoMember(String accessToken) {
@@ -48,7 +51,7 @@ public class MemberServiceImpl implements MemberService {
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
         UriComponents uriBuilder = UriComponentsBuilder.fromUriString(kakaoGetUserURL).build();
-                                   
+
         ResponseEntity<LinkedHashMap> response = restTemplate.exchange(uriBuilder.toString(), HttpMethod.GET, entity,
                 LinkedHashMap.class);
 
@@ -56,7 +59,7 @@ public class MemberServiceImpl implements MemberService {
 
         LinkedHashMap<String, LinkedHashMap> bodyMap = response.getBody();
 
-        log.info("------------------------------------");
+        log.info("bodyMap------------------------------------");
 
         log.info(bodyMap);
 
@@ -65,4 +68,5 @@ public class MemberServiceImpl implements MemberService {
         log.info("kakaoAccount: " + kakaoAccount);
         return kakaoAccount.get("email");
     }
+    
 }

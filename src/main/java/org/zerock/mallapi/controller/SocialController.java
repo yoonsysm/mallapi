@@ -17,7 +17,7 @@ public class SocialController {
     @GetMapping("/api/member/kakao")
     public String[] getMemberFromKakao(String accessToken) {
 
-        log.info("access Token ");
+        log.info("access Token--------------------------- ");
         log.info(accessToken);
 
         memberService.getKakaoMember(accessToken);
