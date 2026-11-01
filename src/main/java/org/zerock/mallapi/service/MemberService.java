@@ -23,4 +23,5 @@ public interface MemberService {
 
         return dto;
     }
+
 }

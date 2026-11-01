@@ -1,6 +1,7 @@
 package org.zerock.mallapi.service;
 
 import java.util.LinkedHashMap;
+import java.util.Optional;
 
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -11,6 +12,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
+import org.zerock.mallapi.domain.Member;
+import org.zerock.mallapi.domain.MemberRole;
 import org.zerock.mallapi.dto.MemberDTO;
 import org.zerock.mallapi.repository.MemberRepository;
 
@@ -32,8 +35,22 @@ public class MemberServiceImpl implements MemberService {
         String email = getEmailFromKakaoAccessToken(accessToken);
 
         log.info("email: " + email);
+        
+        Optional<Member> result = memberRepository.findById(email);
 
-        return null;
+        // 기존의 회원
+        if (result.isPresent()) {
+            MemberDTO memberDTO = entityToDTO(result.get());
+
+            return memberDTO;
+        }
+
+        // 회원이 아니었다면 닉네임은 '소셜회원’으로 패스워드는 임의로 생성
+        Member socialMember = makeSocialMember(email);
+        memberRepository.save(socialMember);
+        MemberDTO memberDTO = entityToDTO(socialMember);
+        
+        return memberDTO;
     }
 
     private String getEmailFromKakaoAccessToken(String accessToken) {
@@ -68,5 +85,37 @@ public class MemberServiceImpl implements MemberService {
         log.info("kakaoAccount: " + kakaoAccount);
         return kakaoAccount.get("email");
     }
-    
+
+    private String makeTempPassword() {
+
+        StringBuffer buffer = new StringBuffer();
+
+        for (int i = 0; i < 10; i++) {
+            buffer.append((char) ((int) (Math.random() * 55) + 65));
+        }
+
+        return buffer.toString();
+    }
+
+    private Member makeSocialMember(String email) {
+
+        String tempPassword = makeTempPassword();
+
+        log.info("tempPassword: " + tempPassword);
+
+        String nickname = "소셜회원";
+
+        Member member = Member.builder()
+                .email(email)
+                .pw(passwordEncoder.encode(tempPassword))
+                .nickname(nickname)
+                .social(true)
+                .build();
+
+        member.addRole(MemberRole.USER);
+
+        return member;
+
+    }
+
 }
