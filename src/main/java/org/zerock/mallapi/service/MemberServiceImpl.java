@@ -15,6 +15,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import org.zerock.mallapi.domain.Member;
 import org.zerock.mallapi.domain.MemberRole;
 import org.zerock.mallapi.dto.MemberDTO;
+import org.zerock.mallapi.dto.MemberModifyDTO;
 import org.zerock.mallapi.repository.MemberRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -35,7 +36,7 @@ public class MemberServiceImpl implements MemberService {
         String email = getEmailFromKakaoAccessToken(accessToken);
 
         log.info("email: " + email);
-        
+
         Optional<Member> result = memberRepository.findById(email);
 
         // 기존의 회원
@@ -49,8 +50,22 @@ public class MemberServiceImpl implements MemberService {
         Member socialMember = makeSocialMember(email);
         memberRepository.save(socialMember);
         MemberDTO memberDTO = entityToDTO(socialMember);
-        
+
         return memberDTO;
+    }
+
+    @Override
+    public void modifyMember(MemberModifyDTO memberModifyDTO) {
+
+        Optional<Member> result = memberRepository.findById(memberModifyDTO.getEmail());
+        Member member = result.orElseThrow();
+
+        member.changePw(passwordEncoder.encode(memberModifyDTO.getPw()));
+        member.changeSocial(false);
+        member.changeNickname(memberModifyDTO.getNickname());
+
+        memberRepository.save(member);
+
     }
 
     private String getEmailFromKakaoAccessToken(String accessToken) {
